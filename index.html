@@ -261,11 +261,15 @@
       min-height: 100%;
     }
 
-    .card img {
+    .card img,
+    .card iframe,
+    .card video {
       width: 100%;
       height: 190px;
       object-fit: cover;
       background: #222;
+      border: 0;
+      display: block;
     }
 
     .card-body {
@@ -511,6 +515,11 @@
         </label>
 
         <label>
+          Video URL
+          <input id="video" placeholder="Pega un link de YouTube, youtu.be o un .mp4 directo. Opcional." />
+        </label>
+
+        <label>
           Cuerpo de la noticia
           <textarea id="body" required placeholder="Escribe los detalles de la nota..."></textarea>
         </label>
@@ -622,7 +631,7 @@
         const article = document.createElement("article");
         article.className = "card";
         article.innerHTML = `
-          <img src="${escapeHTML(post.image || defaultImage)}" alt="Imagen de noticia" onerror="this.src='${defaultImage}'" />
+          ${renderMedia(post)}
           <div class="card-body">
             <div class="meta">${escapeHTML(post.category)} · ${formatDate(post.date)}</div>
             <h4>${escapeHTML(post.title)}</h4>
@@ -662,7 +671,51 @@
       const post = posts.find(item => item.id === id);
       if (!post) return;
 
-      alert(`${post.title}\n\n${post.category} · ${formatDate(post.date)}\n\n${post.body}`);
+      const videoText = post.video ? `
+
+Video: ${post.video}` : "";
+      alert(`${post.title}
+
+${post.category} · ${formatDate(post.date)}
+
+${post.body}${videoText}`);
+    }
+
+    function renderMedia(post) {
+      const video = post.video || "";
+      const youtubeEmbed = getYouTubeEmbed(video);
+
+      if (youtubeEmbed) {
+        return `<iframe src="${escapeHTML(youtubeEmbed)}" title="Video de noticia" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      }
+
+      if (video && video.toLowerCase().endsWith(".mp4")) {
+        return `<video controls src="${escapeHTML(video)}"></video>`;
+      }
+
+      return `<img src="${escapeHTML(post.image || defaultImage)}" alt="Imagen de noticia" onerror="this.src='${defaultImage}'" />`;
+    }
+
+    function getYouTubeEmbed(url) {
+      if (!url) return "";
+
+      try {
+        const parsedUrl = new URL(url);
+
+        if (parsedUrl.hostname.includes("youtube.com")) {
+          const videoId = parsedUrl.searchParams.get("v");
+          return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+        }
+
+        if (parsedUrl.hostname.includes("youtu.be")) {
+          const videoId = parsedUrl.pathname.replace("/", "").trim();
+          return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+        }
+      } catch (error) {
+        return "";
+      }
+
+      return "";
     }
 
     async function deletePost(id) {
@@ -715,6 +768,7 @@
         category: document.getElementById("category").value,
         summary: document.getElementById("summary").value.trim(),
         image: document.getElementById("image").value.trim() || defaultImage,
+        video: document.getElementById("video").value.trim(),
         body: document.getElementById("body").value.trim(),
         date: new Date().toISOString()
       };
