@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Weazel News</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --panel: #141417;
+      --panel-2: #1d1d22;
+      --text: #f5f5f5;
+      --muted: #a1a1aa;
+      --red: #d90429;
+      --red-2: #ef233c;
+      --green: #22c55e;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(217, 4, 41, 0.25), transparent 35%),
+        linear-gradient(135deg, #050505, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--red), #7f0012);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      letter-spacing: -2px;
+      box-shadow: 0 12px 30px var(--shadow);
+    }
+
+    h1 {
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: rgba(20, 20, 23, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px var(--shadow);
+      padding: 22px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #e4e4e7;
+      font-weight: 700;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #0f0f12;
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 170px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    button:hover {
+      background: #2a2a31;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--red), var(--red-2));
+      border: none;
+    }
+
+    .danger {
+      background: #3b1018;
+      color: #ffb3bf;
+    }
+
+    .success {
+      background: rgba(34, 197, 94, 0.15);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .login-box {
+      max-width: 460px;
+      margin: 80px auto;
+    }
+
+    .status {
+      margin-top: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .news-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .news-item {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.035);
+      border-radius: 18px;
+      padding: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .news-item h3 {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .news-item p {
+      color: #d4d4d8;
+      line-height: 1.45;
+    }
+
+    .top-link {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      body {
+        padding: 14px;
+      }
+
+      header,
+      .grid {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">WZ</div>
+        <div>
+          <h1>Panel Weazel News</h1>
+          <p class="subtitle">Publicación privada de noticias</p>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="top-link" href="./index.html">Ver sitio público</a>
+        <button id="logoutBtn" class="danger hidden">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <section id="loginSection" class="card login-box">
+      <h2>Iniciar sesión</h2>
+      <p class="status">Solo cuentas autorizadas pueden publicar noticias.</p>
+
+      <form id="loginForm" style="margin-top: 18px;">
+        <label>
+          Correo
+          <input id="email" type="email" required placeholder="correo@ejemplo.com" />
+        </label>
+
+        <label>
+          Contraseña
+          <input id="password" type="password" required placeholder="Tu contraseña" />
+        </label>
+
+        <button class="primary" type="submit" id="loginBtn">Entrar al panel</button>
+      </form>
+
+      <p id="loginStatus" class="status"></p>
+    </section>
+
+    <main id="adminSection" class="grid hidden">
+      <section class="card">
+        <h2>Nueva noticia</h2>
+        <p class="status">Se guardará en Firestore y aparecerá en la página pública.</p>
+
+        <form id="newsForm" style="margin-top: 18px;">
+          <label>
+            Título
+            <input id="title" required placeholder="Ej: Exclusiva Weazel News" />
+          </label>
+
+          <label>
+            Categoría
+            <select id="category" required>
+              <option>Urgente</option>
+              <option>Policial</option>
+              <option>Ciudad</option>
+              <option>Entrevista</option>
+              <option>Economía</option>
+              <option>Opinión</option>
+            </select>
+          </label>
+
+          <label>
+            Resumen
+            <input id="summary" required placeholder="Resumen corto de la noticia" />
+          </label>
+
+          <label>
+            Imagen URL
+            <input id="image" placeholder="Opcional. Si hay video, el video se mostrará primero." />
+          </label>
+
+          <label>
+            Video URL
+            <input id="video" placeholder="YouTube, youtu.be o .mp4 directo. Opcional." />
+          </label>
+
+          <label>
+            Cuerpo
+            <textarea id="body" required placeholder="Escribe la noticia completa..."></textarea>
+          </label>
+
+          <button class="primary" type="submit" id="publishBtn">Publicar noticia</button>
+        </form>
+
+        <p id="publishStatus" class="status"></p>
+      </section>
+
+      <section class="card">
+        <div class="actions" style="justify-content: space-between;">
+          <div>
+            <h2>Noticias publicadas</h2>
+            <p class="status" id="listStatus">Cargando...</p>
+          </div>
+          <button onclick="loadNews()">Actualizar</button>
+        </div>
+
+        <div id="newsList" class="news-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaP6Pa1MxH15Q7IuXB0Cdk6VVMN9RQpBo",
+      authDomain: "weazel-news-nacion.firebaseapp.com",
+      projectId: "weazel-news-nacion",
+      storageBucket: "weazel-news-nacion.firebasestorage.app",
+      messagingSenderId: "1001189273091",
+      appId: "1:1001189273091:web:4ce4a37a8a1f6731d16836",
+      measurementId: "G-1W3KKL7Q2W"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const noticiasRef = collection(db, "noticias");
+    const defaultImage = "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80";
+
+    const loginSection = document.getElementById("loginSection");
+    const adminSection = document.getElementById("adminSection");
+    const loginForm = document.getElementById("loginForm");
+    const newsForm = document.getElementById("newsForm");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const publishBtn = document.getElementById("publishBtn");
+    const loginStatus = document.getElementById("loginStatus");
+    const publishStatus = document.getElementById("publishStatus");
+    const listStatus = document.getElementById("listStatus");
+    const newsList = document.getElementById("newsList");
+
+    window.loadNews = loadNews;
+    window.deletePost = deletePost;
+
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginSection.classList.add("hidden");
+        adminSection.classList.remove("hidden");
+        logoutBtn.classList.remove("hidden");
+        loadNews();
+      } else {
+        loginSection.classList.remove("hidden");
+        adminSection.classList.add("hidden");
+        logoutBtn.classList.add("hidden");
+      }
+    });
+
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Entrando...";
+      loginStatus.textContent = "";
+
+      try {
+        await signInWithEmailAndPassword(
+          auth,
+          document.getElementById("email").value.trim(),
+          document.getElementById("password").value
+        );
+      } catch (error) {
+        console.error(error);
+        loginStatus.textContent = "No se pudo iniciar sesión. Revisa el correo, la contraseña o si Email/Password está activado en Firebase Auth.";
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Entrar al panel";
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    newsForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      publishBtn.disabled = true;
+      publishBtn.textContent = "Publicando...";
+      publishStatus.textContent = "";
+
+      const post = {
+        title: document.getElementById("title").value.trim(),
+        category: document.getElementById("category").value,
+        summary: document.getElementById("summary").value.trim(),
+        image: document.getEleme
