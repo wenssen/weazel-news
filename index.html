@@ -19,16 +19,12 @@
       --shadow: rgba(0, 0, 0, 0.45);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(217, 4, 41, 0.25), transparent 35%),
+        radial-gradient(circle at top left, rgba(217, 4, 41, 0.28), transparent 35%),
         linear-gradient(135deg, #050505, var(--bg));
       color: var(--text);
       min-height: 100vh;
@@ -38,7 +34,7 @@
       position: sticky;
       top: 0;
       z-index: 10;
-      background: rgba(9, 9, 11, 0.9);
+      background: rgba(9, 9, 11, 0.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
@@ -53,11 +49,7 @@
       gap: 16px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand { display: flex; align-items: center; gap: 12px; }
 
     .logo {
       width: 46px;
@@ -71,29 +63,12 @@
       box-shadow: 0 12px 30px var(--shadow);
     }
 
-    .brand h1 {
-      font-size: 22px;
-      line-height: 1;
-      text-transform: uppercase;
-    }
+    .brand h1 { font-size: 22px; line-height: 1; text-transform: uppercase; }
+    .brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; letter-spacing: 1px; }
 
-    .brand span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 4px;
-      letter-spacing: 1px;
-    }
+    nav { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 
-    nav {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    button,
-    .nav-btn {
+    button, .nav-btn, .admin-link {
       border: 0;
       border-radius: 999px;
       padding: 10px 14px;
@@ -101,23 +76,15 @@
       background: var(--panel-2);
       border: 1px solid var(--border);
       cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
-      font-weight: 700;
+      transition: transform 0.2s ease, background 0.2s ease;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 14px;
     }
 
-    button:hover,
-    .nav-btn:hover {
-      transform: translateY(-1px);
-      background: #2a2a31;
-    }
+    button:hover, .nav-btn:hover, .admin-link:hover { transform: translateY(-1px); background: #2a2a31; }
 
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .primary {
+    .admin-link {
       background: linear-gradient(135deg, var(--red), var(--red-2));
       border: none;
     }
@@ -161,9 +128,7 @@
       margin-bottom: 12px;
     }
 
-    .tag.online {
-      background: rgba(34, 197, 94, 0.95);
-    }
+    .tag.online { background: rgba(34, 197, 94, 0.95); }
 
     .headline h2 {
       font-size: clamp(32px, 5vw, 60px);
@@ -177,11 +142,12 @@
       color: #e5e5e5;
       max-width: 700px;
       font-size: 17px;
+      text-shadow: 0 2px 8px rgba(0,0,0,.7);
     }
 
     .live-card {
       border-radius: 28px;
-      background: var(--panel);
+      background: rgba(20, 20, 23, 0.94);
       border: 1px solid var(--border);
       padding: 24px;
       box-shadow: 0 20px 60px var(--shadow);
@@ -191,64 +157,19 @@
       gap: 20px;
     }
 
-    .status {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      margin-top: 12px;
-    }
+    .live-card h2 { line-height: 1.1; }
+    .status { color: var(--muted); font-size: 13px; line-height: 1.5; margin-top: 12px; }
 
-    .ticker {
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: #111114;
-    }
+    .ticker { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #111114; }
+    .ticker-track { white-space: nowrap; animation: ticker 24s linear infinite; padding: 12px 0; color: var(--yellow); font-weight: 900; text-transform: uppercase; }
+    @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
-    .ticker-track {
-      white-space: nowrap;
-      animation: ticker 24s linear infinite;
-      padding: 12px 0;
-      color: var(--yellow);
-      font-weight: 900;
-      text-transform: uppercase;
-    }
+    main { max-width: 1200px; margin: 0 auto; padding: 24px 20px 60px; }
 
-    @keyframes ticker {
-      from { transform: translateX(100%); }
-      to { transform: translateX(-100%); }
-    }
+    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 22px 0 18px; }
+    .section-title h3 { font-size: 28px; text-transform: uppercase; }
 
-    main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 20px 60px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin: 22px 0 18px;
-    }
-
-    .section-title h3 {
-      font-size: 28px;
-      text-transform: uppercase;
-    }
-
-    .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-    }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 
     .card {
       background: rgba(20, 20, 23, 0.9);
@@ -261,167 +182,35 @@
       min-height: 100%;
     }
 
-    .card img,
-    .card iframe,
-    .card video {
+    .card img, .card iframe, .card video {
       width: 100%;
       height: 190px;
       object-fit: cover;
-      background: #222;
+      background: #000;
       border: 0;
       display: block;
     }
 
-    .card-body {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 1;
-    }
+    .card-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .meta { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .card h4 { font-size: 21px; line-height: 1.15; }
+    .card p { color: #d4d4d8; line-height: 1.5; flex: 1; }
+    .card-actions { display: flex; gap: 8px; margin-top: 8px; }
 
-    .meta {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
+    .empty { border: 1px dashed var(--border); border-radius: 22px; padding: 30px; color: var(--muted); text-align: center; grid-column: 1 / -1; }
 
-    .card h4 {
-      font-size: 21px;
-      line-height: 1.15;
-    }
-
-    .card p {
-      color: #d4d4d8;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .danger {
-      background: #3b1018;
-      color: #ffb3bf;
-    }
-
-    dialog {
-      width: min(720px, calc(100% - 32px));
-      margin: auto;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 0 30px 90px rgba(0,0,0,.65);
-    }
-
-    dialog::backdrop {
-      background: rgba(0,0,0,.72);
-      backdrop-filter: blur(5px);
-    }
-
-    .modal {
-      padding: 24px;
-    }
-
-    .modal h3 {
-      font-size: 26px;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-    }
-
-    form {
-      display: grid;
-      gap: 14px;
-    }
-
-    label {
-      display: grid;
-      gap: 7px;
-      color: #e4e4e7;
-      font-weight: 700;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: #0f0f12;
-      color: var(--text);
-      padding: 12px 14px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 140px;
-      resize: vertical;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    footer {
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      text-align: center;
-      padding: 28px 20px;
-      background: #070708;
-    }
-
-    .empty {
-      border: 1px dashed var(--border);
-      border-radius: 22px;
-      padding: 30px;
-      color: var(--muted);
-      text-align: center;
-      grid-column: 1 / -1;
-    }
+    footer { border-top: 1px solid var(--border); color: var(--muted); text-align: center; padding: 28px 20px; background: #070708; }
 
     @media (max-width: 880px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
+      .hero { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 620px) {
-      .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      nav {
-        justify-content: flex-start;
-      }
-
-      .grid,
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .headline {
-        min-height: 420px;
-      }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      nav { justify-content: flex-start; }
+      .grid { grid-template-columns: 1fr; }
+      .headline { min-height: 420px; }
     }
   </style>
 </head>
@@ -440,7 +229,7 @@
         <button class="nav-btn" onclick="filterNews('Policial')">Policial</button>
         <button class="nav-btn" onclick="filterNews('Ciudad')">Ciudad</button>
         <button class="nav-btn" onclick="filterNews('Urgente')">Urgente</button>
-        <button class="primary" onclick="openModal()">Publicar noticia</button>
+        <a class="admin-link" href="./admin.html">Panel</a>
       </nav>
     </div>
   </header>
@@ -457,9 +246,9 @@
         <span class="tag online" id="connectionTag">Firebase · conectando</span>
         <h2 id="latestTitle">Cargando...</h2>
         <p id="latestDesc" style="color: var(--muted); margin-top: 10px; line-height: 1.5;">Esperando noticias publicadas.</p>
-        <p class="status" id="statusText">Las noticias se guardan online para todos los visitantes.</p>
+        <p class="status" id="statusText">Las noticias se cargan desde Firestore.</p>
       </div>
-      <button class="primary" onclick="openModal()">Crear nueva nota</button>
+      <button onclick="loadNews()">Actualizar noticias</button>
     </aside>
   </section>
 
@@ -472,9 +261,7 @@
   <main>
     <div class="section-title">
       <h3 id="sectionTitle">Noticias recientes</h3>
-      <div class="filters">
-        <button onclick="loadNews()">Actualizar</button>
-      </div>
+      <button onclick="loadNews()">Actualizar</button>
     </div>
 
     <section class="grid" id="newsGrid">
@@ -482,58 +269,8 @@
     </section>
   </main>
 
-  <dialog id="newsDialog">
-    <div class="modal">
-      <h3>Publicar noticia</h3>
-      <form id="newsForm">
-        <div class="form-row">
-          <label>
-            Título
-            <input id="title" required placeholder="Ej: Robo en banco de Paleto Bay" />
-          </label>
-          <label>
-            Categoría
-            <select id="category" required>
-              <option>Urgente</option>
-              <option>Policial</option>
-              <option>Ciudad</option>
-              <option>Entrevista</option>
-              <option>Economía</option>
-              <option>Opinión</option>
-            </select>
-          </label>
-        </div>
-
-        <label>
-          Bajada / resumen
-          <input id="summary" required placeholder="Resumen corto de la noticia" />
-        </label>
-
-        <label>
-          Imagen URL
-          <input id="image" placeholder="Pega una URL de imagen. Si lo dejas vacío se usará una imagen por defecto." />
-        </label>
-
-        <label>
-          Video URL
-          <input id="video" placeholder="Pega un link de YouTube, youtu.be o un .mp4 directo. Opcional." />
-        </label>
-
-        <label>
-          Cuerpo de la noticia
-          <textarea id="body" required placeholder="Escribe los detalles de la nota..."></textarea>
-        </label>
-
-        <div class="modal-actions">
-          <button type="button" onclick="closeModal()">Cancelar</button>
-          <button class="primary" type="submit" id="publishBtn">Publicar</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
-
   <footer>
-    © <span id="year"></span> Weazel News. Sitio de rol para GitHub Pages con Firebase.
+    © <span id="year"></span> Weazel News. Sitio público con Firebase.
   </footer>
 
   <script type="module">
@@ -541,10 +278,7 @@
     import {
       getFirestore,
       collection,
-      addDoc,
       getDocs,
-      deleteDoc,
-      doc,
       query,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -568,20 +302,7 @@
     let activeFilter = "Todas";
 
     const grid = document.getElementById("newsGrid");
-    const dialog = document.getElementById("newsDialog");
-    const form = document.getElementById("newsForm");
-    const publishBtn = document.getElementById("publishBtn");
-
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    window.openModal = function () {
-      form.reset();
-      dialog.showModal();
-    };
-
-    window.closeModal = function () {
-      dialog.close();
-    };
 
     window.filterNews = function (category) {
       activeFilter = category;
@@ -590,7 +311,6 @@
     };
 
     window.loadNews = loadNews;
-    window.deletePost = deletePost;
     window.readPost = readPost;
 
     async function loadNews() {
@@ -637,8 +357,7 @@
             <h4>${escapeHTML(post.title)}</h4>
             <p>${escapeHTML(post.summary)}</p>
             <div class="card-actions">
-              <button onclick="readPost('${post.id}')">Leer</button>
-              <button class="danger" onclick="deletePost('${post.id}')">Eliminar</button>
+              <button onclick="readPost('${post.id}')">Leer nota</button>
             </div>
           </div>
         `;
@@ -653,7 +372,7 @@
 
       if (!latest) {
         document.getElementById("latestTitle").textContent = "Sin noticias publicadas";
-        document.getElementById("latestDesc").textContent = "Publica una noticia para que aparezca destacada aquí.";
+        document.getElementById("latestDesc").textContent = "Cuando publiques desde el panel, aparecerá aquí.";
         document.getElementById("heroTitle").textContent = "La información que la ciudad necesita saber";
         document.getElementById("heroText").textContent = "Reportajes, alertas y cobertura ciudadana desde el equipo de prensa más rápido de la nación.";
         document.getElementById("tickerText").textContent = "WEAZEL NEWS · COBERTURA EN DESARROLLO · INFORMACIÓN CONFIRMADA POR NUESTRO EQUIPO ·";
@@ -671,14 +390,8 @@
       const post = posts.find(item => item.id === id);
       if (!post) return;
 
-      const videoText = post.video ? `
-
-Video: ${post.video}` : "";
-      alert(`${post.title}
-
-${post.category} · ${formatDate(post.date)}
-
-${post.body}${videoText}`);
+      const videoText = post.video ? `\n\nVideo: ${post.video}` : "";
+      alert(`${post.title}\n\n${post.category} · ${formatDate(post.date)}\n\n${post.body}${videoText}`);
     }
 
     function renderMedia(post) {
@@ -718,19 +431,6 @@ ${post.body}${videoText}`);
       return "";
     }
 
-    async function deletePost(id) {
-      const confirmed = confirm("¿Seguro que quieres eliminar esta noticia de Firebase?");
-      if (!confirmed) return;
-
-      try {
-        await deleteDoc(doc(db, "noticias", id));
-        await loadNews();
-      } catch (error) {
-        console.error(error);
-        alert("No se pudo eliminar la noticia. Revisa las reglas de Firestore.");
-      }
-    }
-
     function setStatus(tag, text) {
       document.getElementById("connectionTag").textContent = tag;
       document.getElementById("statusText").textContent = text;
@@ -738,7 +438,6 @@ ${post.body}${videoText}`);
 
     function formatDate(date) {
       if (!date) return "Sin fecha";
-
       return new Intl.DateTimeFormat("es-CL", {
         day: "2-digit",
         month: "2-digit",
@@ -756,35 +455,6 @@ ${post.body}${videoText}`);
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      publishBtn.disabled = true;
-      publishBtn.textContent = "Publicando...";
-
-      const post = {
-        title: document.getElementById("title").value.trim(),
-        category: document.getElementById("category").value,
-        summary: document.getElementById("summary").value.trim(),
-        image: document.getElementById("image").value.trim() || defaultImage,
-        video: document.getElementById("video").value.trim(),
-        body: document.getElementById("body").value.trim(),
-        date: new Date().toISOString()
-      };
-
-      try {
-        await addDoc(noticiasRef, post);
-        closeModal();
-        await loadNews();
-      } catch (error) {
-        console.error(error);
-        alert("No se pudo publicar la noticia. Revisa las reglas de Firestore.");
-      } finally {
-        publishBtn.disabled = false;
-        publishBtn.textContent = "Publicar";
-      }
-    });
 
     loadNews();
   </script>
