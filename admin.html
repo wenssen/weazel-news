@@ -415,7 +415,9 @@
         );
       } catch (error) {
         console.error(error);
-        loginStatus.textContent = "No se pudo iniciar sesión. Revisa el correo, la contraseña o si Email/Password está activado en Firebase Auth.";
+        const message = getAuthErrorMessage(error);
+        loginStatus.textContent = message;
+        alert(message);
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "Entrar al panel";
@@ -436,4 +438,115 @@
         title: document.getElementById("title").value.trim(),
         category: document.getElementById("category").value,
         summary: document.getElementById("summary").value.trim(),
-        image: document.getEleme
+        image: document.getElementById("image").value.trim() || defaultImage,
+        video: document.getElementById("video").value.trim(),
+        body: document.getElementById("body").value.trim(),
+        authorEmail: auth.currentUser?.email || "desconocido",
+        date: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(noticiasRef, post);
+        newsForm.reset();
+        publishStatus.textContent = "Noticia publicada correctamente.";
+        await loadNews();
+      } catch (error) {
+        console.error(error);
+        publishStatus.textContent = "No se pudo publicar. Revisa las reglas de Firestore.";
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.textContent = "Publicar noticia";
+      }
+    });
+
+    async function loadNews() {
+      try {
+        listStatus.textContent = "Cargando noticias...";
+        const q = query(noticiasRef, orderBy("date", "desc"));
+        const snapshot = await getDocs(q);
+        const posts = snapshot.docs.map(documento => ({
+          id: documento.id,
+          ...documento.data()
+        }));
+
+        newsList.innerHTML = "";
+
+        if (posts.length === 0) {
+          newsList.innerHTML = '<div class="news-item"><p>No hay noticias publicadas.</p></div>';
+          listStatus.textContent = "0 noticias.";
+          return;
+        }
+
+        posts.forEach(post => {
+          const item = document.createElement("div");
+          item.className = "news-item";
+          item.innerHTML = `
+            <div class="meta">${escapeHTML(post.category)} · ${formatDate(post.date)}</div>
+            <h3>${escapeHTML(post.title)}</h3>
+            <p>${escapeHTML(post.summary)}</p>
+            <div class="actions">
+              <button class="danger" onclick="deletePost('${post.id}')">Eliminar</button>
+            </div>
+          `;
+          newsList.appendChild(item);
+        });
+
+        listStatus.textContent = `${posts.length} noticias publicadas.`;
+      } catch (error) {
+        console.error(error);
+        listStatus.textContent = "No se pudieron cargar las noticias.";
+      }
+    }
+
+    async function deletePost(id) {
+      const confirmed = confirm("¿Eliminar esta noticia definitivamente?");
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "noticias", id));
+        await loadNews();
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo eliminar. Revisa las reglas de Firestore.");
+      }
+    }
+
+    function getAuthErrorMessage(error) {
+      const code = error?.code || "error-desconocido";
+
+      const messages = {
+        "auth/invalid-credential": "Correo o contraseña incorrectos. Revisa que sean exactamente los mismos que creaste en Firebase Authentication > Usuarios.",
+        "auth/user-not-found": "Ese correo no existe en Firebase Authentication > Usuarios.",
+        "auth/wrong-password": "La contraseña no coincide con el usuario creado en Firebase.",
+        "auth/invalid-email": "El correo escrito no tiene formato válido.",
+        "auth/too-many-requests": "Firebase bloqueó temporalmente los intentos por seguridad. Espera unos minutos y prueba otra vez.",
+        "auth/unauthorized-domain": "El dominio no está autorizado. En Firebase ve a Authentication > Configuración > Dominios autorizados y agrega wenssen.github.io.",
+        "auth/network-request-failed": "No se pudo conectar con Firebase. Revisa internet, extensiones bloqueadoras o prueba en otro navegador."
+      };
+
+      return messages[code] || `Error de Firebase: ${code}. Revisa la consola del navegador para más detalles.`;
+    }
+
+    function formatDate(date) {
+      if (!date) return "Sin fecha";
+
+      return new Intl.DateTimeFormat("es-CL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(new Date(date));
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
