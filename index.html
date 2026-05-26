@@ -14,6 +14,7 @@
       --red: #d90429;
       --red-2: #ef233c;
       --yellow: #ffd166;
+      --green: #22c55e;
       --border: rgba(255, 255, 255, 0.12);
       --shadow: rgba(0, 0, 0, 0.45);
     }
@@ -100,7 +101,7 @@
       background: var(--panel-2);
       border: 1px solid var(--border);
       cursor: pointer;
-      transition: transform 0.2s ease, background 0.2s ease;
+      transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
       font-weight: 700;
     }
 
@@ -108,6 +109,12 @@
     .nav-btn:hover {
       transform: translateY(-1px);
       background: #2a2a31;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .primary {
@@ -154,6 +161,10 @@
       margin-bottom: 12px;
     }
 
+    .tag.online {
+      background: rgba(34, 197, 94, 0.95);
+    }
+
     .headline h2 {
       font-size: clamp(32px, 5vw, 60px);
       line-height: 0.95;
@@ -178,6 +189,13 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 20px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 12px;
     }
 
     .ticker {
@@ -426,15 +444,16 @@
   <section class="hero">
     <article class="headline">
       <span class="tag">En vivo · Weazel News</span>
-      <h2 id="heroTitle">La información que la ciudad necesita saber</h2>
-      <p id="heroText">Reportajes, alertas y cobertura ciudadana desde el equipo de prensa más rápido de la nación.</p>
+      <h2 id="heroTitle">Cargando noticias...</h2>
+      <p id="heroText">Conectando con la base de datos de Weazel News.</p>
     </article>
 
     <aside class="live-card">
       <div>
-        <span class="tag">Último despacho</span>
-        <h2 id="latestTitle">Sin noticias publicadas</h2>
-        <p id="latestDesc" style="color: var(--muted); margin-top: 10px; line-height: 1.5;">Publica una noticia para que aparezca destacada aquí.</p>
+        <span class="tag online" id="connectionTag">Firebase · conectando</span>
+        <h2 id="latestTitle">Cargando...</h2>
+        <p id="latestDesc" style="color: var(--muted); margin-top: 10px; line-height: 1.5;">Esperando noticias publicadas.</p>
+        <p class="status" id="statusText">Las noticias se guardan online para todos los visitantes.</p>
       </div>
       <button class="primary" onclick="openModal()">Crear nueva nota</button>
     </aside>
@@ -450,11 +469,13 @@
     <div class="section-title">
       <h3 id="sectionTitle">Noticias recientes</h3>
       <div class="filters">
-        <button onclick="clearNews()" class="danger">Borrar todo</button>
+        <button onclick="loadNews()">Actualizar</button>
       </div>
     </div>
 
-    <section class="grid" id="newsGrid"></section>
+    <section class="grid" id="newsGrid">
+      <div class="empty">Cargando noticias desde Firebase...</div>
+    </section>
   </main>
 
   <dialog id="newsDialog">
@@ -491,130 +512,150 @@
 
         <label>
           Cuerpo de la noticia
-          <textarea id="body" required placeholder="Escribe los detalles de la nota...">
-          </textarea>
+          <textarea id="body" required placeholder="Escribe los detalles de la nota..."></textarea>
         </label>
 
         <div class="modal-actions">
           <button type="button" onclick="closeModal()">Cancelar</button>
-          <button class="primary" type="submit">Publicar</button>
+          <button class="primary" type="submit" id="publishBtn">Publicar</button>
         </div>
       </form>
     </div>
   </dialog>
 
   <footer>
-    © <span id="year"></span> Weazel News. Sitio de rol para GitHub Pages.
+    © <span id="year"></span> Weazel News. Sitio de rol para GitHub Pages con Firebase.
   </footer>
 
-  <script>
-    const STORAGE_KEY = 'weazel_news_posts_v1';
-    const defaultImage = 'https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const starterPosts = [
-      {
-        id: crypto.randomUUID(),
-        title: 'Cobertura especial desde Los Santos',
-        category: 'Ciudad',
-        summary: 'Weazel News inicia transmisiones con reportes ciudadanos, notas policiales y alertas de último minuto.',
-        body: 'Este portal permite publicar noticias directamente desde el navegador. Las publicaciones quedan guardadas en este dispositivo mediante localStorage.',
-        image: defaultImage,
-        date: new Date().toISOString()
-      }
-    ];
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaP6Pa1MxH15Q7IuXB0Cdk6VVMN9RQpBo",
+      authDomain: "weazel-news-nacion.firebaseapp.com",
+      projectId: "weazel-news-nacion",
+      storageBucket: "weazel-news-nacion.firebasestorage.app",
+      messagingSenderId: "1001189273091",
+      appId: "1:1001189273091:web:4ce4a37a8a1f6731d16836",
+      measurementId: "G-1W3KKL7Q2W"
+    };
 
-    let posts = loadPosts();
-    let activeFilter = 'Todas';
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const noticiasRef = collection(db, "noticias");
+    const defaultImage = "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80";
 
-    const grid = document.getElementById('newsGrid');
-    const dialog = document.getElementById('newsDialog');
-    const form = document.getElementById('newsForm');
+    let posts = [];
+    let activeFilter = "Todas";
 
-    document.getElementById('year').textContent = new Date().getFullYear();
+    const grid = document.getElementById("newsGrid");
+    const dialog = document.getElementById("newsDialog");
+    const form = document.getElementById("newsForm");
+    const publishBtn = document.getElementById("publishBtn");
 
-    function loadPosts() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return starterPosts;
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-      try {
-        return JSON.parse(saved);
-      } catch (error) {
-        return starterPosts;
-      }
-    }
-
-    function savePosts() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    }
-
-    function openModal() {
+    window.openModal = function () {
       form.reset();
       dialog.showModal();
-    }
+    };
 
-    function closeModal() {
+    window.closeModal = function () {
       dialog.close();
-    }
+    };
 
-    function filterNews(category) {
+    window.filterNews = function (category) {
       activeFilter = category;
-      document.getElementById('sectionTitle').textContent = category === 'Todas' ? 'Noticias recientes' : `Noticias: ${category}`;
+      document.getElementById("sectionTitle").textContent = category === "Todas" ? "Noticias recientes" : `Noticias: ${category}`;
       renderPosts();
+    };
+
+    window.loadNews = loadNews;
+    window.deletePost = deletePost;
+    window.readPost = readPost;
+
+    async function loadNews() {
+      try {
+        setStatus("Firebase · conectado", "Cargando noticias desde Firestore...");
+
+        const q = query(noticiasRef, orderBy("date", "desc"));
+        const snapshot = await getDocs(q);
+
+        posts = snapshot.docs.map(documento => ({
+          id: documento.id,
+          ...documento.data()
+        }));
+
+        renderPosts();
+        setStatus("Firebase · online", `Noticias cargadas: ${posts.length}`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Firebase · error", "No se pudieron cargar las noticias. Revisa las reglas de Firestore.");
+        grid.innerHTML = '<div class="empty">Error al cargar noticias. Revisa Firestore y las reglas de seguridad.</div>';
+      }
     }
 
     function renderPosts() {
-      const visiblePosts = activeFilter === 'Todas'
+      const visiblePosts = activeFilter === "Todas"
         ? posts
         : posts.filter(post => post.category === activeFilter);
 
-      grid.innerHTML = '';
+      grid.innerHTML = "";
 
       if (visiblePosts.length === 0) {
-        grid.innerHTML = '<div class="empty">No hay noticias en esta categoría.</div>';
+        grid.innerHTML = '<div class="empty">No hay noticias publicadas en esta categoría.</div>';
         updateHighlights();
         return;
       }
 
-      visiblePosts
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .forEach(post => {
-          const article = document.createElement('article');
-          article.className = 'card';
-          article.innerHTML = `
-            <img src="${escapeHTML(post.image || defaultImage)}" alt="Imagen de noticia" onerror="this.src='${defaultImage}'" />
-            <div class="card-body">
-              <div class="meta">${escapeHTML(post.category)} · ${formatDate(post.date)}</div>
-              <h4>${escapeHTML(post.title)}</h4>
-              <p>${escapeHTML(post.summary)}</p>
-              <div class="card-actions">
-                <button onclick="readPost('${post.id}')">Leer</button>
-                <button class="danger" onclick="deletePost('${post.id}')">Eliminar</button>
-              </div>
+      visiblePosts.forEach(post => {
+        const article = document.createElement("article");
+        article.className = "card";
+        article.innerHTML = `
+          <img src="${escapeHTML(post.image || defaultImage)}" alt="Imagen de noticia" onerror="this.src='${defaultImage}'" />
+          <div class="card-body">
+            <div class="meta">${escapeHTML(post.category)} · ${formatDate(post.date)}</div>
+            <h4>${escapeHTML(post.title)}</h4>
+            <p>${escapeHTML(post.summary)}</p>
+            <div class="card-actions">
+              <button onclick="readPost('${post.id}')">Leer</button>
+              <button class="danger" onclick="deletePost('${post.id}')">Eliminar</button>
             </div>
-          `;
-          grid.appendChild(article);
-        });
+          </div>
+        `;
+        grid.appendChild(article);
+      });
 
       updateHighlights();
     }
 
     function updateHighlights() {
-      const latest = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      const latest = posts[0];
 
       if (!latest) {
-        document.getElementById('latestTitle').textContent = 'Sin noticias publicadas';
-        document.getElementById('latestDesc').textContent = 'Publica una noticia para que aparezca destacada aquí.';
-        document.getElementById('heroTitle').textContent = 'La información que la ciudad necesita saber';
-        document.getElementById('heroText').textContent = 'Reportajes, alertas y cobertura ciudadana desde el equipo de prensa más rápido de la nación.';
-        document.getElementById('tickerText').textContent = 'WEAZEL NEWS · COBERTURA EN DESARROLLO · INFORMACIÓN CONFIRMADA POR NUESTRO EQUIPO ·';
+        document.getElementById("latestTitle").textContent = "Sin noticias publicadas";
+        document.getElementById("latestDesc").textContent = "Publica una noticia para que aparezca destacada aquí.";
+        document.getElementById("heroTitle").textContent = "La información que la ciudad necesita saber";
+        document.getElementById("heroText").textContent = "Reportajes, alertas y cobertura ciudadana desde el equipo de prensa más rápido de la nación.";
+        document.getElementById("tickerText").textContent = "WEAZEL NEWS · COBERTURA EN DESARROLLO · INFORMACIÓN CONFIRMADA POR NUESTRO EQUIPO ·";
         return;
       }
 
-      document.getElementById('latestTitle').textContent = latest.title;
-      document.getElementById('latestDesc').textContent = latest.summary;
-      document.getElementById('heroTitle').textContent = latest.title;
-      document.getElementById('heroText').textContent = latest.summary;
-      document.getElementById('tickerText').textContent = `ÚLTIMA HORA · ${latest.title} · ${latest.summary} · WEAZEL NEWS ·`;
+      document.getElementById("latestTitle").textContent = latest.title;
+      document.getElementById("latestDesc").textContent = latest.summary;
+      document.getElementById("heroTitle").textContent = latest.title;
+      document.getElementById("heroText").textContent = latest.summary;
+      document.getElementById("tickerText").textContent = `ÚLTIMA HORA · ${latest.title} · ${latest.summary} · WEAZEL NEWS ·`;
     }
 
     function readPost(id) {
@@ -624,63 +665,74 @@
       alert(`${post.title}\n\n${post.category} · ${formatDate(post.date)}\n\n${post.body}`);
     }
 
-    function deletePost(id) {
-      const confirmed = confirm('¿Seguro que quieres eliminar esta noticia?');
+    async function deletePost(id) {
+      const confirmed = confirm("¿Seguro que quieres eliminar esta noticia de Firebase?");
       if (!confirmed) return;
 
-      posts = posts.filter(post => post.id !== id);
-      savePosts();
-      renderPosts();
+      try {
+        await deleteDoc(doc(db, "noticias", id));
+        await loadNews();
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo eliminar la noticia. Revisa las reglas de Firestore.");
+      }
     }
 
-    function clearNews() {
-      const confirmed = confirm('Esto borrará todas las noticias guardadas en este dispositivo. ¿Continuar?');
-      if (!confirmed) return;
-
-      posts = [];
-      savePosts();
-      renderPosts();
+    function setStatus(tag, text) {
+      document.getElementById("connectionTag").textContent = tag;
+      document.getElementById("statusText").textContent = text;
     }
 
     function formatDate(date) {
-      return new Intl.DateTimeFormat('es-CL', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      if (!date) return "Sin fecha";
+
+      return new Intl.DateTimeFormat("es-CL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       }).format(new Date(date));
     }
 
     function escapeHTML(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    form.addEventListener('submit', event => {
+    form.addEventListener("submit", async event => {
       event.preventDefault();
 
+      publishBtn.disabled = true;
+      publishBtn.textContent = "Publicando...";
+
       const post = {
-        id: crypto.randomUUID(),
-        title: document.getElementById('title').value.trim(),
-        category: document.getElementById('category').value,
-        summary: document.getElementById('summary').value.trim(),
-        image: document.getElementById('image').value.trim() || defaultImage,
-        body: document.getElementById('body').value.trim(),
+        title: document.getElementById("title").value.trim(),
+        category: document.getElementById("category").value,
+        summary: document.getElementById("summary").value.trim(),
+        image: document.getElementById("image").value.trim() || defaultImage,
+        body: document.getElementById("body").value.trim(),
         date: new Date().toISOString()
       };
 
-      posts.unshift(post);
-      savePosts();
-      closeModal();
-      renderPosts();
+      try {
+        await addDoc(noticiasRef, post);
+        closeModal();
+        await loadNews();
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo publicar la noticia. Revisa las reglas de Firestore.");
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.textContent = "Publicar";
+      }
     });
 
-    renderPosts();
+    loadNews();
   </script>
 </body>
 </html>
